@@ -6,11 +6,11 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.append(current_dir)
 
-from scripts.distorted_cube import load_config, render_cube
+from scripts.single_obj import load_config, render_obj
 
 def main():
     # get the absolute path to the config file
-    config_path = os.path.join(current_dir, "configs", "distorted_cube.yaml")
+    config_path = os.path.join(current_dir, "configs", "single_obj.yaml")
     
     # print status for debugging
     print(f"looking for config at: {config_path}")
@@ -22,8 +22,8 @@ def main():
     # load the config
     config = load_config(config_path)
     
-    # render the cube directly to train and test folders
-    render_cube(config, train_ratio=0.33)
+    # render the obj directly to train and test folders
+    render_obj(config, train_ratio=0.33)
 
 if __name__ == "__main__":
     main()
