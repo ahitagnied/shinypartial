@@ -1,0 +1,43 @@
+output:
+  directory: "output"
+  format: "PNG"
+  resolution: [800, 800]
+  samples: 128
+
+blender_obj:
+  spacing: 0.4           
+  items:
+    - path: "./files/wine.obj"
+      scale: [0.12, 0.12, 0.12]          
+      base_location: [ -0.3, 0, 0 ]  
+      rotation: [0, 0, 0]
+      bevel:
+        width: 0.01
+        segments: 2
+        profile: 0.5
+      material:
+        metallic: 1.0
+        roughness: 0.1
+        specular: 0.5
+
+    - path: "./files/coffee.obj"
+      scale: [2.3, 2.3, 2.3]       
+      base_location: [ +0.3, 0, 0 ]  
+      rotation: [90, 0, 0]
+      bevel:
+        width: 0.005
+        segments: 2
+        profile: 0.3
+      material:
+        metallic: 0.8
+        roughness: 0.2
+        specular: 0.4
+
+environment:
+  hdri_path: "assets/paris.exr"
+
+camera:
+  num_images:     9
+  theta_max_deg:  45       
+  distance:       6.0       
+  focal_length:   85       
