@@ -10,7 +10,6 @@ import bpy
 from mathutils import Vector
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
-bpy.ops.preferences.addon_enable(module="io_import_scene_obj")
 bpy.ops.preferences.addon_enable(module="io_scene_fbx")
 
 def load_config(config_path):
@@ -34,78 +33,73 @@ def setup_scene(config):
     bpy.context.scene.cycles.samples = config["output"]["samples"]
     bpy.context.scene.render.film_transparent = True # <-- make background transparent like NeRO
 
+#----------------------------------------------------------------------------------------------
 def import_object(config):
-    # import
-    obj_path = config["blender_obj"]["path"]
-    ext = os.path.splitext(obj_path)[1].lower()
+    """import single object from config with mtl support"""
+    obj_cfg = config["blender_obj"]
+    path = obj_cfg["path"]
+    ext = os.path.splitext(path)[1].lower()
     
     if ext == ".obj":
-        # try different obj import operators
-        bpy.ops.wm.obj_import(filepath=obj_path)
+        # simple import - materials are imported by default if .mtl exists
+        bpy.ops.wm.obj_import(filepath=path)
     elif ext == ".fbx":
-        bpy.ops.import_scene.fbx(filepath=obj_path)
+        bpy.ops.import_scene.fbx(filepath=path)
     else:
-        raise Exception(f"Unsupported file format: {ext}")
-    
-    objs = bpy.context.selected_objects
-    
-    if not objs:
-        raise Exception("No objects were imported")
-    
-    # assume first imported object
-    obj = objs[0]
-    obj.scale    = tuple(config["blender_obj"]["scale"])
-    obj.location = tuple(config["blender_obj"]["location"])
+        raise Exception(f"Unsupported: {ext}")
 
-    # bevel
+    imported = bpy.context.selected_objects
+    if not imported:
+        raise Exception("no objects were imported")
+    
+    obj = imported[0]
+    obj.scale = tuple(obj_cfg["scale"])
+    obj.location = tuple(obj_cfg["location"])
+    
+    # apply rotation if specified
+    rot_deg = obj_cfg.get("rotation", [0, 0, 0])
+    obj.rotation_euler = tuple(math.radians(r) for r in rot_deg)
+    
+    apply_bevel(obj, obj_cfg["bevel"])
+    
+    # only apply procedural material if no materials were imported
+    if not obj.data.materials or obj_cfg.get("override_materials", False):
+        apply_shiny_material(obj, obj_cfg["material"])
+    
+    return [obj]  # return as list for consistency
+
+def apply_bevel(obj, bevel_cfg):
     bpy.context.view_layer.objects.active = obj
-    bevel_mod = obj.modifiers.new(name="Bevel", type='BEVEL')
-    bevel_mod.width    = config["blender_obj"]["bevel"]["width"]
-    bevel_mod.segments = config["blender_obj"]["bevel"]["segments"]
-    bevel_mod.profile  = config["blender_obj"]["bevel"]["profile"]
-    bpy.ops.object.modifier_apply(modifier=bevel_mod.name)
+    mod = obj.modifiers.new("Bevel", 'BEVEL')
+    mod.width, mod.segments, mod.profile = (
+      bevel_cfg["width"], bevel_cfg["segments"], bevel_cfg["profile"]
+    )
+    bpy.ops.object.modifier_apply(modifier=mod.name)
 
-    # create a shiny material for the object
-    material = bpy.data.materials.new("ShinyMaterial")
-
-    # ─── insert material node setup here ─────────────────────────────────────
-    material.use_nodes = True
-    nodes = material.node_tree.nodes
-    links = material.node_tree.links
-    # clear out the default nodes
-    for n in list(nodes):
+def apply_shiny_material(obj, mat_cfg):
+    mat = bpy.data.materials.new("Shiny")
+    mat.use_nodes = True
+    nodes, links = mat.node_tree.nodes, mat.node_tree.links
+    for n in list(nodes): 
         nodes.remove(n)
-    # add principled BSDF and output
-    bsdf   = nodes.new(type="ShaderNodeBsdfPrincipled")
-    output = nodes.new(type="ShaderNodeOutputMaterial")
-    links.new(bsdf.outputs["BSDF"], output.inputs["Surface"])
-    # set your parameters
-    # after you've created bsdf = nodes.new(…) …
-    # set metallic & roughness as before
-    bsdf.inputs["Metallic"].default_value  = config["blender_obj"]["material"]["metallic"]
-    bsdf.inputs["Roughness"].default_value = config["blender_obj"]["material"]["roughness"]
+    bsdf = nodes.new("ShaderNodeBsdfPrincipled")
+    out  = nodes.new("ShaderNodeOutputMaterial")
+    links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
 
-    # look up the specular socket by name
-    spec_sock = next((sock for sock in bsdf.inputs if sock.name == "Specular"), None)
-    if spec_sock is not None:
-        spec_sock.default_value = config["blender_obj"]["material"]["specular"]
+    bsdf.inputs["Metallic"].default_value  = mat_cfg["metallic"]
+    bsdf.inputs["Roughness"].default_value = mat_cfg["roughness"]
+    spec = bsdf.inputs.get("Specular")
+    if spec:
+        spec.default_value = mat_cfg["specular"]
     else:
-        # fallback: maybe they intended the IOR socket?
-        ior_sock = next((sock for sock in bsdf.inputs if sock.name == "IOR"), None)
-        if ior_sock is not None:
-            ior_sock.default_value = config["blender_obj"]["material"]["specular"]
-        else:
-            print("warning: no Specular or IOR input found on Principled BSDF")
+        bsdf.inputs["IOR"].default_value = mat_cfg["specular"]
 
-    # ───────────────────────────────────────────────────────────────────────────
-
-    # assign material to the object
+    # --- assign the material correctly:
     if obj.data.materials:
-        obj.data.materials[0] = material
+        obj.data.materials[0] = mat
     else:
-        obj.data.materials.append(material)
-
-    return obj
+        obj.data.materials.append(mat)
+#----------------------------------------------------------------------------------------------
 
 def setup_environment(config):
     """set up the hdri environment"""
