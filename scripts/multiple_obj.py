@@ -10,7 +10,6 @@ import bpy
 from mathutils import Vector
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
-# bpy.ops.preferences.addon_enable(module="io_import_scene_obj")
 bpy.ops.preferences.addon_enable(module="io_scene_fbx")
 
 def load_config(config_path):
@@ -35,32 +34,6 @@ def setup_scene(config):
     bpy.context.scene.render.film_transparent = True # <-- make background transparent like NeRO
 
 #-----------------------------------------------------------------------------------------------
-# def import_objects(config):
-#     objs = []
-#     spacing = config["blender_obj"]["spacing"]
-#     for idx, obj_cfg in enumerate(config["blender_obj"]["items"]):
-#         path = obj_cfg["path"]
-#         ext  = os.path.splitext(path)[1].lower()
-#         if ext == ".obj":
-#             bpy.ops.wm.obj_import(filepath=path)      # ← use `path` here
-#         elif ext == ".fbx":
-#             bpy.ops.import_scene.fbx(filepath=path)    # ← and here
-#         else:
-#             raise Exception(f"Unsupported: {ext}")
-
-#         imported = bpy.context.selected_objects
-#         obj = imported[0]
-#         obj.scale = tuple(obj_cfg["scale"])
-#         x0, y0, z0 = obj_cfg["base_location"]
-#         obj.location = (x0 + idx * spacing, y0, z0)
-#         # apply rotation from config (degrees → radians)
-#         rot_deg = obj_cfg.get("rotation", [0, 0, 0])
-#         obj.rotation_euler = tuple(math.radians(r) for r in rot_deg)
-#         apply_bevel(obj, obj_cfg["bevel"])
-#         apply_shiny_material(obj, obj_cfg["material"])
-#         objs.append(obj)
-#     return objs
-
 def import_objects(config):
     objs = []
     spacing = config["blender_obj"]["spacing"]
