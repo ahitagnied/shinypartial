@@ -5,9 +5,10 @@ output:
   samples: 128
 
 blender_obj:
-  path: "./files/body.obj"
-  scale: [1.0, 1.0, 1.0]
-  location: [0, 0, -40]
+  path: "./files/egg.obj"
+  scale: [0.5, 0.5, 0.5]
+  location: [0, 0, 0]
+  rotation: [0, 0, 0]  
   bevel:
     width: 0.02
     segments: 3
@@ -21,6 +22,6 @@ environment:
   hdri_path: "assets/paris.exr"
 
 camera:
-  num_images: 9
+  num_images: 300
   theta_max_deg: 85
-  distance: 20.0
+  distance: 10.0
