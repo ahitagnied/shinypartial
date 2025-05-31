@@ -1,0 +1,16 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 02.06.2011 10:38:27
+
+newmtl _10858_egg_v2_L3_eggegg_egg_jpg
+Ns 8000
+Ni 1.5000
+d 1.0000
+Tr 0.0000
+Tf 1.0000 1.0000 1.0000 
+illum 3
+Ka 1.0000 1.0000 1.0000
+Kd 1.0000 1.0000 1.0000
+Ks 0.8000 0.8000 0.8000
+Ke 0.0000 0.0000 0.0000
+map_Kd egg.jpg
+refl 0.900000
