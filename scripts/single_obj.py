@@ -165,18 +165,22 @@ def render_obj(config, train_ratio):
     # calculate camera parameters
     camera_data = camera.data
     camera_angle_x = camera_data.angle_x
-    target = Vector(tuple(config["blender_obj"]["location"]))
+
+    obj = import_object(config)[0]  # get the imported object
+    bbox_center = sum((Vector(b) for b in obj.bound_box), Vector()) / 8
+    target = obj.matrix_world @ bbox_center
 
     # render settings
     num_images = config["camera"]["num_images"]
     phi_g = np.pi*(3 - np.sqrt(5))                  # golden angle ≃ 2.39996 rad
+    theta_min = np.deg2rad(config["camera"]["theta_min_deg"])
     theta_max = np.deg2rad(config["camera"]["theta_max_deg"])  # e.g. 82.9
 
     distance = config["camera"]["distance"]
     i = np.arange(num_images)
 
     # uniformly in [cos(theta_max), 1]
-    z = 1 - i/(num_images-1)*(1 - np.cos(theta_max))
+    z = np.cos(theta_min) + i/(num_images-1)*(np.cos(theta_max) - np.cos(theta_min))
     thetas = np.arccos(z)                           # elevation array of length N
     phis = (i * phi_g) % (2*np.pi)                  # azimuth array of length N
     rotation_step = phi_g                           # store the same for every frame
