@@ -192,6 +192,9 @@ def render_obj(config, train_ratio):
     test_camera_params  = []
 
     for i in range(num_images):
+        theta = thetas[i]  
+        phi = phis[i]  
+        
         # pos camera in sphere around origin  
         r = distance  
         x = r * np.sin(theta) * np.cos(phi)  
