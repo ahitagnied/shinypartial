@@ -154,14 +154,15 @@ def render_obj(config, train_ratio):
 
     # after import_objects()
     locs = [obj.location for obj in all_objs]
-    centroid = sum(locs, Vector()) / len(locs)
-    target = centroid
+    centroid = sum(locs, Vector()) / len(locs)  
+    target = centroid  
     
-    bpy.ops.object.camera_add()
-    camera = bpy.context.active_object
-    camera.location = (5, 0, 0)
-    camera.rotation_euler = (math.pi/2, 0, math.pi/2)
-    bpy.context.scene.camera = camera
+    bpy.ops.object.camera_add()  
+    camera = bpy.context.active_object  
+    bpy.context.scene.camera = camera  
+    
+    # Add scene update here  
+    bpy.context.view_layer.update()
     
     # calculate camera parameters
     camera_data = camera.data
@@ -191,30 +192,29 @@ def render_obj(config, train_ratio):
     test_camera_params  = []
 
     for i in range(num_images):
-        # pick out this frame's elevation and azimuth
-        theta = thetas[i]
-        phi = phis[i]
-
-        # spherical --> cartesian
-        r = distance
-        z_cam = r * np.cos(theta)
-        x = r * np.sin(theta) * np.cos(phi)
-        y = r * np.sin(theta) * np.sin(phi)
-
-        camera.location = (x, y, z_cam)
-
-        # point at origin
+        # pos camera in sphere around origin  
+        r = distance  
+        x = r * np.sin(theta) * np.cos(phi)  
+        y = r * np.sin(theta) * np.sin(phi)  
+        z_cam = r * np.cos(theta)  
+    
+        camera.location = (x, y, z_cam)  
+    
+        # point camera at world origin (0,0,0)  
         direction = target - camera.location
-        rot_quat = direction.to_track_quat('-Z', 'Y')
-        camera.rotation_euler = rot_quat.to_euler()
-
-        # build frame dict & decide train vs test by i % stride
-        frame = {
-            "file_path": f"train/r_{ntrain}" if i % stride == 0 else f"test/r_{ntest}",
-            "rotation": rotation_step,
-            "transform_matrix": [list(row) for row in camera.matrix_world],
-            "camera_angle_x": camera_angle_x
-        }
+        rot_quat = direction.to_track_quat('-Z', 'Y')  
+        camera.rotation_euler = rot_quat.to_euler()  
+    
+        # force scene update before extracting matrix  
+        bpy.context.view_layer.update()  
+    
+        # extract transform matrix  
+        frame = {  
+            "file_path": f"train/r_{ntrain}" if i % stride == 0 else f"test/r_{ntest}",  
+            "rotation": rotation_step,  
+            "transform_matrix": [list(row) for row in camera.matrix_world],  
+            "camera_angle_x": camera_angle_x  
+        }  
 
         if i % stride == 0:
             train_camera_params.append(frame);  ntrain += 1
