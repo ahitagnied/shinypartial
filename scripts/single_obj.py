@@ -138,7 +138,7 @@ def setup_environment(config):
 
 def render_obj(config, train_ratio):
     """render blender_obj and save to train and test folders based on script name"""
-    # get script name for folder name
+# get script name for folder name
     folder_name = os.path.splitext(os.path.basename(inspect.getfile(inspect.currentframe())))[0]
     
     # setup directories
@@ -153,22 +153,24 @@ def render_obj(config, train_ratio):
     
     # setup scene and camera
     setup_scene(config)
-    blender_obj = import_object(config)
+    blender_obj_list = import_object(config)  # Import once
     setup_environment(config)
     
     bpy.ops.object.camera_add()
-    camera = bpy.context.active_object
-    camera.location = (5, 0, 0)
-    camera.rotation_euler = (math.pi/2, 0, math.pi/2)
-    bpy.context.scene.camera = camera
+    camera = bpy.context.active_object  
+    bpy.context.scene.camera = camera  
+
+    obj = blender_obj_list[0]  
+    obj.location = (0, 0, 0)  # center object at world origin  
+
+    # force scene update  
+    bpy.context.view_layer.update()  
     
     # calculate camera parameters
     camera_data = camera.data
     camera_angle_x = camera_data.angle_x
 
-    obj = import_object(config)[0]  # get the imported object
-    bbox_center = sum((Vector(b) for b in obj.bound_box), Vector()) / 8
-    target = obj.matrix_world @ bbox_center
+    obj = blender_obj_list[0]  # Use the already imported object
 
     # render settings
     num_images = config["camera"]["num_images"]
@@ -197,26 +199,29 @@ def render_obj(config, train_ratio):
         theta = thetas[i]
         phi = phis[i]
 
-        # spherical --> cartesian
-        r = distance
+        # position camera in sphere around origin  
+        r = distance  
+        x = r * np.sin(theta) * np.cos(phi)  
+        y = r * np.sin(theta) * np.sin(phi)  
         z_cam = r * np.cos(theta)
-        x = r * np.sin(theta) * np.cos(phi)
-        y = r * np.sin(theta) * np.sin(phi)
 
         camera.location = (x, y, z_cam)
 
-        # point at origin
-        direction = target - camera.location
-        rot_quat = direction.to_track_quat('-Z', 'Y')
-        camera.rotation_euler = rot_quat.to_euler()
+        # point camera at world origin (0,0,0)  
+        direction = Vector((0, 0, 0)) - camera.location  
+        rot_quat = direction.to_track_quat('-Z', 'Y')  
+        camera.rotation_euler = rot_quat.to_euler()  
 
-        # build frame dict & decide train vs test by i % stride
-        frame = {
-            "file_path": f"train/r_{ntrain}" if i % stride == 0 else f"test/r_{ntest}",
-            "rotation": rotation_step,
-            "transform_matrix": [list(row) for row in camera.matrix_world],
-            "camera_angle_x": camera_angle_x
-        }
+        # force scene update before extracting matrix  
+        bpy.context.view_layer.update()  
+
+        # extract transform matrix  
+        frame = {  
+            "file_path": f"train/r_{ntrain}" if i % stride == 0 else f"test/r_{ntest}",  
+            "rotation": rotation_step,  
+            "transform_matrix": [list(row) for row in camera.matrix_world],  
+            "camera_angle_x": camera_angle_x  
+        }  
 
         if i % stride == 0:
             train_camera_params.append(frame);  ntrain += 1
