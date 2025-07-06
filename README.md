@@ -62,9 +62,3 @@ cd ~/gs-dataset
 ~/software/blender-4.0.0-linux-x64/blender --background --python run.py
 ```
 > Add -- --cycles-device CUDA at the end of the command if you want GPU rendering
-
-## Progress
-
-- [x] Script has been fixed to handle both 'Specular' and 'Specular IOR' inputs
-- [ ] Add script for deformed cube render, and other complex objects
-- [ ] Structure better to add other feature maps [normal map, object map, ...]
