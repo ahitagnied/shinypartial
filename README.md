@@ -2,7 +2,10 @@
 
 The goal of this repository is to fabricate a stack of datasets to train 3D Gaussian Splatting models working with reflections. 
 
-![banner](public/banner.png)
+<div align="center">
+  <img src="public/gif/single_obj.gif" width="35%" />
+  <img src="public/gif/multiple_obj.gif" width="35%" />
+</div>
 
 ## Set up:
 
