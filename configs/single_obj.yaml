@@ -5,23 +5,25 @@ output:
   samples: 128
 
 blender_obj:
-  path: "./files/egg.obj"
-  scale: [0.5, 0.5, 0.5]
+  path: "./files/cola.obj"
+  scale: [50.0, 50.0, 50.0]
   location: [0, 0, 0]
-  rotation: [0, 0, 0]  
+  rotation: [90, 0, 0]  
+  override_materials: true
   bevel:
-    width: 0.02
-    segments: 3
+    width: 0.01
+    segments: 2
     profile: 0.5
   material:
-    metallic: 1.0
-    roughness: 0.1
-    specular: 0.5
+    metallic: 0.8
+    roughness: 0.02
+    specular: 1.0
 
 environment:
   hdri_path: "assets/paris.exr"
 
 camera:
   num_images: 300
+  theta_min_deg: 5
   theta_max_deg: 85
-  distance: 10.0
+  distance: 250
