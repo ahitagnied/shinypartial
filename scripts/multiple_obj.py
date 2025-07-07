@@ -179,7 +179,7 @@ def render_obj(config, train_ratio):
     i = np.arange(num_images)
 
     # uniformly in cos(theta_max), cos(theta_min)]
-    z = np.cos(theta_max) + i/(num_images-1)*(np.cos(theta_min) - np.cos(theta_max))
+    z = np.cos(theta_min) + i/(num_images-1)*(np.cos(theta_max) - np.cos(theta_min))
     thetas = np.arccos(z)                           # elevation array of length N
     phis = (i * phi_g) % (2*np.pi)                  # azimuth array of length N
     rotation_step = phi_g                           # store the same for every frame
@@ -197,8 +197,8 @@ def render_obj(config, train_ratio):
         
         # pos camera in sphere around origin  
         r = distance  
-        x = r * np.sin(theta) * np.cos(phi)  
-        y = r * np.sin(theta) * np.sin(phi)  
+        x = target.x + r * np.sin(theta) * np.cos(phi)  
+        y = target.y + r * np.sin(theta) * np.sin(phi)  
         z_cam = r * np.cos(theta)  
     
         camera.location = (x, y, z_cam)  
