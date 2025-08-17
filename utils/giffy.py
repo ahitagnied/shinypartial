@@ -3,11 +3,9 @@ import imageio.v2 as imageio
 
 def make_gif(folder_name, name, duration=0.03):
     """make a gif using all images in a folder"""
-    # make sure the dir exists
     os.makedirs('./public/gif', exist_ok=True)
     output_dir = os.path.join('./public/gif', f'{name}.gif')
     train_folder = os.path.join(folder_name, 'train')
-    # find all images, only egb not normal maps
     files = sorted(
         f for f in os.listdir(train_folder)
         if f.lower().endswith(('.png')) and not f.lower().endswith('_normal.png')
@@ -21,7 +19,6 @@ def make_gif(folder_name, name, duration=0.03):
 
 def main():
     """save gifs for all training sets"""
-    # for each train folder save a gif
     for folder in os.listdir('./output/'):
         item_path = os.path.join('./output', folder)
         if os.path.isdir(item_path):
