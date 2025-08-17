@@ -209,10 +209,10 @@ def render_obj(config, train_ratio):
 
         if i % stride == 0:
             train_camera_params.append(frame);  ntrain += 1
-            out_dir = train_dir;  fname = f"r_{ntrain-1}"
+            out_dir = train_dir;  fname = f"r_{ntrain-1:04d}"
         else:
             test_camera_params.append(frame);   ntest  += 1
-            out_dir = test_dir;   fname = f"r_{ntest-1}"
+            out_dir = test_dir;   fname = f"r_{ntest-1:04d}"
 
         bpy.context.scene.render.filepath = os.path.join(out_dir, f"{fname}.png")
         bpy.ops.render.render(write_still=True)
