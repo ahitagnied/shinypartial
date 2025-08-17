@@ -6,10 +6,10 @@ output:
 
 blender_obj:
   path: "./files/cola.obj"
-  scale: [50.0, 50.0, 50.0]
+  scale: [1.0, 1.0, 1.0]    
   location: [0, 0, 0]
   rotation: [90, 0, 0]  
-  override_materials: true
+  override_materials: false
   bevel:
     width: 0.01
     segments: 2
@@ -20,10 +20,12 @@ blender_obj:
     specular: 1.0
 
 environment:
-  hdri_path: "assets/paris.exr"
+  hdri_path: "assets/bedroom.exr"
 
 camera:
-  num_images: 300
-  theta_min_deg: 5
+  num_images: 9
+  theta_min_deg: 25
   theta_max_deg: 85
-  distance: 250
+  phi_start_deg: 30
+  phi_end_deg: 30
+  distance: 7

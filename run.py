@@ -12,9 +12,10 @@ def main():
     print(f"looking for config at: {config_path}")
     if os.path.exists(config_path):
         print("config file found!")
+        config = load_config(config_path)
     else:
         print("config file NOT found!")
-        config = load_config(config_path)
+        return
 
     render_obj(config, train_ratio=0.33)
 

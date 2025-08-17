@@ -151,13 +151,29 @@ def render_obj(config, train_ratio):
     phi_g = np.pi*(3 - np.sqrt(5))
     theta_min = np.deg2rad(config["camera"]["theta_min_deg"])
     theta_max = np.deg2rad(config["camera"]["theta_max_deg"])
+    
+    phi_start_deg = config["camera"].get("phi_start_deg", 0)
+    phi_end_deg = config["camera"].get("phi_end_deg", 360)
+    phi_start_rad = np.deg2rad(phi_start_deg)
+    phi_end_rad = np.deg2rad(phi_end_deg)
+    
+    phi_range_rad = phi_end_rad - phi_start_rad
+    if phi_range_rad < 2*np.pi:
+        phi_g = phi_range_rad / num_images
+    else:
+        phi_g = np.pi*(3 - np.sqrt(5))
 
     distance = config["camera"]["distance"]
     i = np.arange(num_images)
 
     z = np.cos(theta_min) + i/(num_images-1)*(np.cos(theta_max) - np.cos(theta_min))
     thetas = np.arccos(z)
-    phis = (i * phi_g) % (2*np.pi)
+    
+    if phi_range_rad < 2*np.pi:
+        phis = phi_start_rad + i * phi_g
+    else:
+        phis = (i * phi_g) % (2*np.pi)
+    
     rotation_step = phi_g
 
     num_train = round(num_images * train_ratio)

@@ -5,27 +5,27 @@ output:
   samples: 128
 
 blender_obj:
-  spacing: 25.0          
+  spacing: 2.7         
   items:
-    - path: "./files/venus.obj"
+    - path: "./files/coca-cola/coca-cola.obj"
       scale: [1.0, 1.0, 1.0]    
       base_location: [ 0, 0, 0 ]  
-      rotation: [0, 0, 0]
+      rotation: [90, 0, 0]
       override_materials: false  
       bevel:
         width: 0.01
         segments: 2
         profile: 0.5
       material:
-        metallic:        1.0    # full metal
-        roughness:       0.0    # zero roughness = perfect mirror
+        metallic:        1.0
+        roughness:       0.0
         specular:        1.0
 
-    - path: "./files/Zeus_300k_ZR.obj"
+    - path: "./files/coca-cola/coca-cola.obj"
       scale: [1.0, 1.0, 1.0]     
-      base_location: [ 0, 0, -5 ]  
-      rotation: [0, 0, 0]
-      override_materials: true  
+      base_location: [ 0, 0, 0 ]  
+      rotation: [90, 0, 0]
+      override_materials: false  
       bevel:
         width: 0.01
         segments: 2
@@ -36,11 +36,13 @@ blender_obj:
         specular:        1.0
 
 environment:
-  hdri_path: "assets/outdoor.exr"
+  hdri_path: "assets/suburb.exr"
 
 camera:
-  num_images:     1500
+  num_images:     9
   theta_min_deg:  0
   theta_max_deg:  85
-  distance:       120
+  phi_start_deg:  0
+  phi_end_deg:    360
+  distance:       10
   focal_length:   55
