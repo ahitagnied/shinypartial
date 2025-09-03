@@ -1,15 +1,16 @@
 # 3D GSDR Dataset
 
-The goal of this repository is to fabricate a stack of datasets to train 3D Gaussian Splatting models working with reflections. 
+The goal of this repository is to generate datasets for training 3D Gaussian Splatting models with multiple camera trajectory patterns. The system supports three different camera trajectories: golden spiral (spherical), diamond (planar), and zigzag (planar).
 
 <div align="center">
-  <img src="public/gif/single_obj.gif" width="35%" />
-  <img src="public/gif/multiple_obj.gif" width="35%" />
+  <img src="public/gif/cola_t25-85_p0-360_golden_spiral.gif" width="30%" />
+  <img src="public/gif/cola_t25-85_p0-360_diamond.gif" width="30%" />
+  <img src="public/gif/cola_t25-85_p0-360_zigzag.gif" width="30%" />
 </div>
 
-## Set up:
+## Setup
 
-Install Blender in home directory
+Install Blender in home directory:
 
 ```bash
 cd ~
@@ -18,7 +19,8 @@ cd ~/software
 wget https://download.blender.org/release/Blender4.0/blender-4.0.0-linux-x64.tar.xz
 tar -xf blender-4.0.0-linux-x64.tar.xz
 ```
-Install PyYAML for Blender
+
+Install PyYAML for Blender:
 
 ```bash
 # find Blender's python
@@ -28,40 +30,54 @@ find ~/software/blender-4.0.0-linux-x64 -name "python*" | grep bin
 ~/software/blender-4.0.0-linux-x64/4.0/python/bin/python3.10 -m pip install pyyaml
 ```
 
-## Project Structure 
+## Camera Trajectories
 
-```bash
-project/
-├── README.md
-├── assets/
-│   ├── paris.exr
-│   └── ... # contains all hdri files
-├── configs/
-│   ├── cube.yaml
-│   └── ... # contains all config files
-├── output/
-│   ├── cube/
-|       ├── cube_000.png
-|       └── ... 
-│   └── ... # contains all image folders for each render
-│   └── layout.md 
-├── scripts/
-│   ├── __init__.py
-│   ├── cube.py
-│   └── ... # contains all render scripts
-└── .gitignore
-└── requirements.txt
-└── run.py # --> main landing script runs + saves images for all render scripts 
+### Golden Spiral (Spherical)
+- Even distribution of viewpoints on a sphere
+- Uses golden ratio for optimal coverage
+- Camera always looks at center
 
+### Diamond (Planar) 
+- Diamond-shaped path in a specified plane
+- Camera maintains perpendicular view to plane
+- Configurable plane orientation and size
+
+### Zigzag (Planar)
+- Z-shaped path in a specified plane  
+- Three segments: horizontal → diagonal → horizontal
+- Camera maintains perpendicular view to plane
+
+## Configuration
+
+Edit `configs/single_obj.yaml` or `configs/multiple_obj.yaml` to configure:
+
+```yaml
+camera:
+  trajectory_type: "golden_spiral"  # or "diamond" or "zigzag"
+  
+  # For spherical trajectories
+  theta_min_deg: 25
+  theta_max_deg: 85
+  phi_start_deg: 0
+  phi_end_deg: 360
+  distance: 7.0
+  
+  # For planar trajectories
+  plane_distance: 12.0
+  plane_normal: [0, 1, 0]  # XZ plane, or [0.707, 0.707, 0] for 45° tilt
+  diamond_size: 1.0
+  zigzag_width: 2.0
+  zigzag_height: 1.0
 ```
 
-## How to run?
-
-Run this from the project root, it will generate datasets for all scenes. Currently there is only one render, which is a simple reflecting cube with an environment map, but that is to change in due time. The rendered images will be saved in their respective subfolders in the 'output' directory. For example, the image files for cube rendering are generated in output/cube/cube_000.png through cube_035.png.
+## How to Run
 
 ```bash
 # run from project root
 cd ~/gs-dataset
-~/software/blender-4.0.0-linux-x64/blender --background --python run.py
+~/software/blender-4.0.0-linux-x64/blender --background --python render.py -- single_obj
 ```
-> Add -- --cycles-device CUDA at the end of the command if you want GPU rendering
+
+Output images and transform matrices will be saved in `output/` with train/test splits.
+
+> Add `-- --cycles-device CUDA` at the end for GPU rendering
