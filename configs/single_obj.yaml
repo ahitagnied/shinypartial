@@ -26,6 +26,13 @@ camera:
   num_images: 9
   theta_min_deg: 25
   theta_max_deg: 85
-  phi_start_deg: 30
-  phi_end_deg: 30
-  distance: 7
+  phi_start_deg: 0
+  phi_end_deg: 360
+  distance: 7.0
+  
+  trajectory_type: "zigzag"
+  
+  plane_distance: 2.0
+  diamond_size: 1.0
+  zigzag_width: 7.0
+  zigzag_height: 7.0

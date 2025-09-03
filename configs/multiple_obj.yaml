@@ -9,7 +9,7 @@ blender_obj:
   items:
     - path: "./files/coca-cola/coca-cola.obj"
       scale: [1.0, 1.0, 1.0]    
-      base_location: [ 0, 0, 0 ]  
+      location: [ 0, 0, 0 ]  
       rotation: [90, 0, 0]
       override_materials: false  
       bevel:
@@ -23,7 +23,7 @@ blender_obj:
 
     - path: "./files/coca-cola/coca-cola.obj"
       scale: [1.0, 1.0, 1.0]     
-      base_location: [ 0, 0, 0 ]  
+      location: [ 0, 0, 0 ]  
       rotation: [90, 0, 0]
       override_materials: false  
       bevel:
@@ -39,10 +39,17 @@ environment:
   hdri_path: "assets/suburb.exr"
 
 camera:
-  num_images:     9
+  num_images:     300
   theta_min_deg:  0
   theta_max_deg:  85
   phi_start_deg:  0
   phi_end_deg:    360
   distance:       10
   focal_length:   55
+  
+  trajectory_type: "golden_spiral"
+  
+  plane_distance: 2.0
+  diamond_size: 1.0
+  zigzag_width: 1.0
+  zigzag_height: 1.0

@@ -1,0 +1,108 @@
+import numpy as np
+
+def golden_spiral_trajectory(config):
+    num_images = config["camera"]["num_images"]
+    phi_g = np.pi*(3 - np.sqrt(5))
+    theta_min = np.deg2rad(config["camera"]["theta_min_deg"])
+    theta_max = np.deg2rad(config["camera"]["theta_max_deg"])
+    
+    phi_start_deg = config["camera"].get("phi_start_deg", 0)
+    phi_end_deg = config["camera"].get("phi_end_deg", 360)
+    phi_start_rad = np.deg2rad(phi_start_deg)
+    phi_end_rad = np.deg2rad(phi_end_deg)
+    
+    phi_range_rad = phi_end_rad - phi_start_rad
+    if phi_range_rad < 2*np.pi:
+        phi_g = phi_range_rad / num_images
+    else:
+        phi_g = np.pi*(3 - np.sqrt(5))
+
+    i = np.arange(num_images)
+    z = np.cos(theta_min) + i/(num_images-1)*(np.cos(theta_max) - np.cos(theta_min))
+    thetas = np.arccos(z)
+    
+    if phi_range_rad < 2*np.pi:
+        phis = phi_start_rad + i * phi_g
+    else:
+        phis = (i * phi_g) % (2*np.pi)  
+    
+    return thetas, phis, phi_g
+
+def diamond_trajectory(config):
+    num_images = config["camera"]["num_images"]
+    plane_distance = config["camera"].get("plane_distance", 2.0)
+    diamond_size = config["camera"].get("diamond_size", 1.0)
+    
+    t = np.linspace(0, 1, num_images)
+    
+    x = np.zeros(num_images)
+    y = np.zeros(num_images)
+    
+    for i, ti in enumerate(t):
+        if ti <= 0.25:
+            x[i] = 4 * ti * diamond_size
+            y[i] = 0
+        elif ti <= 0.5:
+            x[i] = diamond_size
+            y[i] = 4 * (ti - 0.25) * diamond_size
+        elif ti <= 0.75:
+            x[i] = diamond_size - 4 * (ti - 0.5) * diamond_size
+            y[i] = diamond_size
+        else:
+            x[i] = 0
+            y[i] = diamond_size - 4 * (ti - 0.75) * diamond_size
+    
+    z = np.full(num_images, plane_distance)
+    
+    # For plane trajectory: return coordinates that make camera look down
+    # theta = π/2 puts camera in horizontal plane, phi controls XY position
+    thetas = np.full(num_images, np.pi/2)  # 90 degrees from Z-axis
+    phis = np.arctan2(y, x)                # Angle in XY plane
+    
+    rotation_step = 0
+    return thetas, phis, rotation_step
+
+def zigzag_trajectory(config):
+    num_images = config["camera"]["num_images"]
+    plane_distance = config["camera"].get("plane_distance", 2.0)
+    zigzag_width = config["camera"].get("zigzag_width", 1.0)
+    zigzag_height = config["camera"].get("zigzag_height", 1.0)
+    
+    t = np.linspace(0, 1, num_images)
+    
+    x = np.zeros(num_images)
+    y = np.zeros(num_images)
+    
+    for i, ti in enumerate(t):
+        if ti <= 0.33:
+            x[i] = 3 * ti * zigzag_width
+            y[i] = 0
+        elif ti <= 0.66:
+            x[i] = zigzag_width - 3 * (ti - 0.33) * zigzag_width
+            y[i] = 3 * (ti - 0.33) * zigzag_height
+        else:
+            x[i] = 3 * (ti - 0.66) * zigzag_width
+            y[i] = zigzag_height
+    
+    z = np.full(num_images, plane_distance)
+    
+    # For plane trajectory: return coordinates that make camera look down
+    # theta = π/2 puts camera in horizontal plane, phi controls XY position
+    thetas = np.full(num_images, np.pi/2)  # 90 degrees from Z-axis
+    phis = np.arctan2(y, x)                # Angle in XY plane
+    
+    rotation_step = 0
+    return thetas, phis, rotation_step
+
+
+def get_trajectory(config):
+    trajectory_type = config["camera"].get("trajectory_type", "golden_spiral")
+    
+    if trajectory_type == "golden_spiral":
+        return golden_spiral_trajectory(config)
+    elif trajectory_type == "diamond":
+        return diamond_trajectory(config)
+    elif trajectory_type == "zigzag":
+        return zigzag_trajectory(config)
+    else:
+        raise ValueError(f"Unknown trajectory type: {trajectory_type}")
