@@ -26,7 +26,13 @@ def golden_spiral_trajectory(config):
     else:
         phis = (i * phi_g) % (2*np.pi)  
     
-    return thetas, phis, phi_g
+    return {
+        "mode": "spherical",
+        "thetas": thetas,
+        "phis": phis,
+        "rotation_step": phi_g,
+        "look_at": "center"
+    }
 
 def diamond_trajectory(config):
     num_images = config["camera"]["num_images"]
@@ -54,13 +60,13 @@ def diamond_trajectory(config):
     
     z = np.full(num_images, plane_distance)
     
-    # For plane trajectory: return coordinates that make camera look down
-    # theta = π/2 puts camera in horizontal plane, phi controls XY position
-    thetas = np.full(num_images, np.pi/2)  # 90 degrees from Z-axis
-    phis = np.arctan2(y, x)                # Angle in XY plane
-    
-    rotation_step = 0
-    return thetas, phis, rotation_step
+    return {
+        "mode": "planar",
+        "positions": np.stack([x, y, z], axis=-1),
+        "plane_normal": config["camera"].get("plane_normal", [0, 1, 0]),
+        "rotation_step": 0,
+        "look_at": "perpendicular"
+    }
 
 def zigzag_trajectory(config):
     num_images = config["camera"]["num_images"]
@@ -86,13 +92,13 @@ def zigzag_trajectory(config):
     
     z = np.full(num_images, plane_distance)
     
-    # For plane trajectory: return coordinates that make camera look down
-    # theta = π/2 puts camera in horizontal plane, phi controls XY position
-    thetas = np.full(num_images, np.pi/2)  # 90 degrees from Z-axis
-    phis = np.arctan2(y, x)                # Angle in XY plane
-    
-    rotation_step = 0
-    return thetas, phis, rotation_step
+    return {
+        "mode": "planar",
+        "positions": np.stack([x, y, z], axis=-1),
+        "plane_normal": config["camera"].get("plane_normal", [0, 1, 0]),
+        "rotation_step": 0,
+        "look_at": "perpendicular"
+    }
 
 
 def get_trajectory(config):
