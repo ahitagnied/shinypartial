@@ -172,5 +172,6 @@ def generate_folder_name(config, mode="single"):
     phi_min = config["camera"].get("phi_start_deg", 0)
     phi_max = config["camera"].get("phi_end_deg", 360)
     trajectory_type = config["camera"].get("trajectory_type", "golden_spiral")
+    look_at = config["camera"].get("look_at", "perpendicular")
     
-    return f"{obj_name}_t{theta_min}-{theta_max}_p{phi_min}-{phi_max}_{trajectory_type}"
+    return f"{obj_name}_t{theta_min}-{theta_max}_p{phi_min}-{phi_max}_{trajectory_type}_{look_at}"
