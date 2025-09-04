@@ -50,6 +50,7 @@ camera:
   trajectory_type: "golden_spiral"
   
   plane_distance: 2.0
+  plane_normal: [0, 1, 0]
   diamond_size: 1.0
   zigzag_width: 1.0
   zigzag_height: 1.0

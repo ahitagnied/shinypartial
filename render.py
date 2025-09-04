@@ -41,8 +41,7 @@ def render_scene(config, train_ratio=0.33, mode="auto"):
     camera_data = camera.data
     camera_angle_x = camera_data.angle_x
     
-    thetas, phis, rotation_step = get_trajectory(config)
-    distance = config["camera"]["distance"]
+    trajectory = get_trajectory(config)
     num_images = config["camera"]["num_images"]
     
     num_train = round(num_images * train_ratio)
@@ -53,24 +52,46 @@ def render_scene(config, train_ratio=0.33, mode="auto"):
     test_camera_params = []
     
     for i in range(num_images):
-        theta = thetas[i]
-        phi = phis[i]
+        if trajectory["mode"] == "spherical":
+            theta = trajectory["thetas"][i]
+            phi = trajectory["phis"][i]
+            r = config["camera"]["distance"]
+            
+            x = r * np.sin(theta) * np.cos(phi)
+            y = r * np.sin(theta) * np.sin(phi)
+            z_cam = r * np.cos(theta)
+            
+            camera.location = (x, y, z_cam)
+            
+            if trajectory["look_at"] == "center":
+                direction = target - camera.location
+                rot_quat = direction.to_track_quat('-Z', 'Y')
+                camera.rotation_euler = rot_quat.to_euler()
         
-        r = distance
-        x = r * np.sin(theta) * np.cos(phi)
-        y = r * np.sin(theta) * np.sin(phi)
-        z_cam = r * np.cos(theta)
-        
-        camera.location = (x, y, z_cam)
-        direction = target - camera.location
-        rot_quat = direction.to_track_quat('-Z', 'Y')
-        camera.rotation_euler = rot_quat.to_euler()
+        elif trajectory["mode"] == "planar":
+            pos = trajectory["positions"][i]
+            plane_normal = Vector(trajectory["plane_normal"]).normalized()
+            
+            right = Vector((1, 0, 0)) if abs(plane_normal.dot(Vector((1, 0, 0)))) < 0.9 else Vector((0, 1, 0))
+            up = plane_normal.cross(right).normalized()
+            right = up.cross(plane_normal).normalized()
+            
+            camera_pos = Vector(target) - plane_normal * pos[2] + right * pos[0] + up * pos[1]
+            camera.location = camera_pos
+            
+            if trajectory["look_at"] == "perpendicular":
+                rot_quat = plane_normal.to_track_quat('-Z', 'Y')
+                camera.rotation_euler = rot_quat.to_euler()
+            elif trajectory["look_at"] == "center":
+                direction = target - camera.location
+                rot_quat = direction.to_track_quat('-Z', 'Y')
+                camera.rotation_euler = rot_quat.to_euler()
         
         bpy.context.view_layer.update()
         
         frame = {
             "file_path": f"train/r_{ntrain}" if i % stride == 0 else f"test/r_{ntest}",
-            "rotation": rotation_step,
+            "rotation": trajectory["rotation_step"],
             "transform_matrix": [list(row) for row in camera.matrix_world],
             "camera_angle_x": camera_angle_x
         }
