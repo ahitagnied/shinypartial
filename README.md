@@ -28,9 +28,9 @@ camera:
   theta_min_deg: 25
   theta_max_deg: 85
   
-  # Planar trajectories  
+  # Planar trajectories
   plane_distance: 12.0
-  plane_normal: [0.707, 0.707, 0]  # [0,1,0] for XZ plane, [0.707,0.707,0] for 45° tilt
+  plane_normal: [0.707, 0.707, 0]   # [0,1,0] for XZ plane, [0.707,0.707,0] for 45° tilt
   diamond_size: 1.0
   zigzag_width: 2.0
   zigzag_height: 1.0
