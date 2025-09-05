@@ -4,8 +4,8 @@ Generate datasets for training 3D Gaussian Splatting models with multiple camera
 
 <div align="center">
   <img src="public/gif/cola_t25-85_p0-360_golden_spiral.gif" width="30%" />
-  <img src="public/gif/cola_t25-85_p0-360_diamond.gif" width="30%" />
-  <img src="public/gif/cola_t25-85_p0-360_zigzag.gif" width="30%" />
+  <img src="public/gif/cola_t25-85_p0-360_diamond_center_offset-5-55.gif" width="30%" />
+  <img src="public/gif/cola_t25-85_p0-360_zigzag_center_offset-5-55.gif" width="30%" />
 </div>
 
 ## Camera Trajectories

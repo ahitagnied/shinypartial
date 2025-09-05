@@ -48,9 +48,14 @@ camera:
   focal_length:   55
   
   trajectory_type: "golden_spiral"
+  look_at: "center"
   
   plane_distance: 2.0
   plane_normal: [0, 1, 0]
-  diamond_size: 1.0
+  
+  diamond_size: 5.0
+
+  trajectory_offset: [-5, -5, 5]
+  
   zigzag_width: 1.0
   zigzag_height: 1.0

@@ -38,6 +38,8 @@ def diamond_trajectory(config):
     num_images = config["camera"]["num_images"]
     plane_distance = config["camera"].get("plane_distance", 2.0)
     diamond_size = config["camera"].get("diamond_size", 1.0)
+    look_at = config["camera"].get("look_at", "perpendicular")
+    trajectory_offset = config["camera"].get("trajectory_offset", [0, 0, 0])
     
     t = np.linspace(0, 1, num_images)
     
@@ -60,12 +62,16 @@ def diamond_trajectory(config):
     
     z = np.full(num_images, plane_distance)
     
+    positions = np.stack([x, y, z], axis=-1)
+    positions += np.array(trajectory_offset)
+    
     return {
         "mode": "planar",
-        "positions": np.stack([x, y, z], axis=-1),
+        "positions": positions,
         "plane_normal": config["camera"].get("plane_normal", [0, 1, 0]),
         "rotation_step": 0,
-        "look_at": "perpendicular"
+        "look_at": look_at,
+        "trajectory_offset": trajectory_offset
     }
 
 def zigzag_trajectory(config):
@@ -73,6 +79,8 @@ def zigzag_trajectory(config):
     plane_distance = config["camera"].get("plane_distance", 2.0)
     zigzag_width = config["camera"].get("zigzag_width", 1.0)
     zigzag_height = config["camera"].get("zigzag_height", 1.0)
+    look_at = config["camera"].get("look_at", "perpendicular")
+    trajectory_offset = config["camera"].get("trajectory_offset", [0, 0, 0])
     
     t = np.linspace(0, 1, num_images)
     
@@ -92,12 +100,16 @@ def zigzag_trajectory(config):
     
     z = np.full(num_images, plane_distance)
     
+    positions = np.stack([x, y, z], axis=-1)
+    positions += np.array(trajectory_offset)
+    
     return {
         "mode": "planar",
-        "positions": np.stack([x, y, z], axis=-1),
+        "positions": positions,
         "plane_normal": config["camera"].get("plane_normal", [0, 1, 0]),
         "rotation_step": 0,
-        "look_at": "perpendicular"
+        "look_at": look_at,
+        "trajectory_offset": trajectory_offset
     }
 
 

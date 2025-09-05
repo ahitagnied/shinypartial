@@ -174,4 +174,12 @@ def generate_folder_name(config, mode="single"):
     trajectory_type = config["camera"].get("trajectory_type", "golden_spiral")
     look_at = config["camera"].get("look_at", "perpendicular")
     
-    return f"{obj_name}_t{theta_min}-{theta_max}_p{phi_min}-{phi_max}_{trajectory_type}_{look_at}"
+    folder_name = f"{obj_name}_t{theta_min}-{theta_max}_p{phi_min}-{phi_max}_{trajectory_type}_{look_at}"
+    
+    if trajectory_type != "golden_spiral":
+        trajectory_offset = config["camera"].get("trajectory_offset", [0, 0, 0])
+        if trajectory_offset != [0, 0, 0]:
+            offset_str = f"_offset{trajectory_offset[0]}{trajectory_offset[1]}{trajectory_offset[2]}"
+            folder_name += offset_str
+    
+    return folder_name
