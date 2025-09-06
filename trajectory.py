@@ -112,6 +112,41 @@ def zigzag_trajectory(config):
         "trajectory_offset": trajectory_offset
     }
 
+def plus_trajectory(config):
+    num_images = config["camera"]["num_images"]
+    plane_distance = config["camera"].get("plane_distance", 2.0)
+    plus_horizontal_length = config["camera"].get("plus_horizontal_length", 1.0)
+    plus_vertical_length = config["camera"].get("plus_vertical_length", 1.0)
+    look_at = config["camera"].get("look_at", "perpendicular")
+    trajectory_offset = config["camera"].get("trajectory_offset", [0, 0, 0])
+    
+    t = np.linspace(0, 1, num_images)
+    
+    x = np.zeros(num_images)
+    y = np.zeros(num_images)
+    
+    for i, ti in enumerate(t):
+        if ti <= 0.5:
+            x[i] = (ti - 0.25) * 2 * plus_horizontal_length
+            y[i] = 0
+        else:
+            x[i] = 0
+            y[i] = (ti - 0.75) * 2 * plus_vertical_length
+    
+    z = np.full(num_images, plane_distance)
+    
+    positions = np.stack([x, y, z], axis=-1)
+    positions += np.array(trajectory_offset)
+    
+    return {
+        "mode": "planar",
+        "positions": positions,
+        "plane_normal": config["camera"].get("plane_normal", [0, 1, 0]),
+        "rotation_step": 0,
+        "look_at": look_at,
+        "trajectory_offset": trajectory_offset
+    }
+
 
 def get_trajectory(config):
     trajectory_type = config["camera"].get("trajectory_type", "golden_spiral")
@@ -122,5 +157,7 @@ def get_trajectory(config):
         return diamond_trajectory(config)
     elif trajectory_type == "zigzag":
         return zigzag_trajectory(config)
+    elif trajectory_type == "plus":
+        return plus_trajectory(config)
     else:
         raise ValueError(f"Unknown trajectory type: {trajectory_type}")

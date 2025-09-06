@@ -30,15 +30,18 @@ camera:
   phi_end_deg: 360
   distance: 7.0
   
-  trajectory_type: "zigzag"
+  trajectory_type: "plus"
   look_at: "center"
   
-  plane_distance: 5.0
-  plane_normal: [0.707, 0.707, 0]
+  plane_distance: 3.5
+  plane_normal: [0.3, 0.4, 0]
   
   diamond_size: 5.0
+
+  plus_horizontal_length: 10.0
+  plus_vertical_length: 10.0
   
-  trajectory_offset: [-5, -5, 5]
+  trajectory_offset: [0, 0, 0]
   
   zigzag_width: 7.0
   zigzag_height: 7.0
