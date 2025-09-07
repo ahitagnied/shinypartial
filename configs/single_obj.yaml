@@ -33,13 +33,13 @@ camera:
   trajectory_type: "plus"
   look_at: "center"
   
-  plane_distance: 45
-  plane_normal: [0.3, 0.4, 0]
+  plane_distance: 70
+  plane_normal: [0, 0.4, -0.2]
   
   diamond_size: 5.0
 
-  plus_horizontal_length: 10.0
-  plus_vertical_length: 10.0
+  plus_horizontal_length: 50.0
+  plus_vertical_length: 50.0
   
   trajectory_offset: [0, 0, -10]
   
