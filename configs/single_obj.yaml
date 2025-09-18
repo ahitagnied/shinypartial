@@ -33,15 +33,15 @@ camera:
   trajectory_type: "plus"
   look_at: "center"
   
-  plane_distance: 70
+  plane_distance: 450
   plane_normal: [0, 0.4, -0.2]
   
   diamond_size: 5.0
 
-  plus_horizontal_length: 50.0
-  plus_vertical_length: 50.0
+  plus_horizontal_length: 800.0
+  plus_vertical_length: 800.0
   
-  trajectory_offset: [0, 0, -10]
+  trajectory_offset: [0, 0, -80]
   
   zigzag_width: 7.0
   zigzag_height: 7.0
