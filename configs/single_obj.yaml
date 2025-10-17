@@ -5,9 +5,9 @@ output:
   samples: 128
 
 blender_obj:
-  path: "./files/deformed_surface.obj"
+  path: "./files/cola.obj"
   scale: [1.0, 1.0, 1.0]    
-  location: [0, 0, -10]
+  location: [0, 0, 0]
   rotation: [90, 0, 0]  
   override_materials: true
   bevel:
@@ -24,13 +24,13 @@ environment:
 
 camera:
   num_images: 300
-  theta_min_deg: 25
-  theta_max_deg: 85
+  theta_min_deg: 45
+  theta_max_deg: 120
   phi_start_deg: 0
-  phi_end_deg: 360
+  phi_end_deg: 60
   distance: 7.0
   
-  trajectory_type: "plus"
+  trajectory_type: "golden_spiral"
   look_at: "center"
   
   plane_distance: 450

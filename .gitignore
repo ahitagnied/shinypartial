@@ -1,4 +1,7 @@
 __pycache__
 output/*/
-*.mov
+*.MOV
 *.mp4
+**/*.png
+**/*.exr
+frames/*
