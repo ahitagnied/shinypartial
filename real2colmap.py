@@ -110,6 +110,21 @@ def run_colmap(frames_dir, use_gpu=True):
     num_images = get_model_size(model)
     print(f"selected model {model.name} with {num_images} images")
     
+    if model.name != "0":
+        print(f"renaming {model.name} to 0 and removing other models...")
+        import shutil
+        
+        for other_model in models:
+            if other_model != model:
+                shutil.rmtree(other_model)
+                print(f"removed {other_model.name}")
+        
+        model_0 = sparse / "0"
+        if model_0.exists():
+            shutil.rmtree(model_0)
+        model.rename(model_0)
+        model = model_0
+    
     print("undistorting images...")
     _run([
         "colmap", "image_undistorter",
