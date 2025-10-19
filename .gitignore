@@ -4,4 +4,4 @@ output/*/
 *.mp4
 **/*.png
 **/*.exr
-frames/*
+colmap/*
