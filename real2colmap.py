@@ -1,7 +1,10 @@
 import cv2 as cv
-import os, subprocess
-from pathlib import Path
+import os
+import subprocess
 import sys
+import struct
+import shutil
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
 def sample_frames(video, fps):
@@ -19,14 +22,75 @@ def sample_frames(video, fps):
             frames.append(frame)
     return frames
 
+def blur_score(frame):
+    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    return cv.Laplacian(gray, cv.CV_64F).var()
+
 def filter_sharp_frames(frames, keep_n=350):
-    def blur_score(frame):
-        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        return cv.Laplacian(gray, cv.CV_64F).var()
     with ThreadPoolExecutor() as executor:
-        scored = list(executor.map(lambda f: (f, blur_score(f)), frames))
-    scored.sort(key=lambda x: x[1], reverse=True)
-    return [f for f, _ in scored[:keep_n]]
+        scores = list(executor.map(blur_score, frames))
+        scored = [(i, frame, score) for i, (frame, score) in enumerate(zip(frames, scores))]
+    
+    scored.sort(key=lambda x: x[2], reverse=True)
+    best_scored = scored[:keep_n]
+    best_scored.sort(key=lambda x: x[0])
+    best_frames = [frame for _, frame, _ in best_scored]
+    
+    indices = [i for i, _, _ in best_scored]
+    max_gap = max(indices[i+1] - indices[i] for i in range(len(indices)-1)) if len(indices) > 1 else 0
+    
+    if max_gap > 30:
+        print(f"WARNING: Largest temporal gap is {max_gap} frames!")
+        print(f"Consider reducing --max_frames or using --sliding_window")
+    
+    return best_frames
+
+def filter_sharp_frames_sliding_window(frames, keep_n=350, max_gap=20):
+    with ThreadPoolExecutor() as executor:
+        scores = list(executor.map(blur_score, frames))
+        scored = [(i, frame, score) for i, (frame, score) in enumerate(zip(frames, scores))]
+    
+    num_segments = max(1, len(frames) // max_gap)
+    segment_size = len(frames) // num_segments
+    
+    selected = []
+    for seg in range(num_segments):
+        start_idx = seg * segment_size
+        end_idx = min((seg + 1) * segment_size, len(frames))
+        
+        segment_frames = [(i, frame, score) for i, frame, score in scored 
+                         if start_idx <= i < end_idx]
+        
+        if segment_frames:
+            segment_frames.sort(key=lambda x: x[2], reverse=True)
+            selected.append(segment_frames[0])
+    
+    if len(selected) < keep_n:
+        selected_indices = {i for i, _, _ in selected}
+        remaining = [(i, frame, score) for i, frame, score in scored 
+                    if i not in selected_indices]
+        remaining.sort(key=lambda x: x[2], reverse=True)
+        
+        for i, frame, score in remaining:
+            if len(selected) >= keep_n:
+                break
+                
+            if not selected:
+                selected.append((i, frame, score))
+            else:
+                closest_dist = min(abs(i - sel_i) for sel_i, _, _ in selected)
+                if closest_dist <= max_gap:
+                    selected.append((i, frame, score))
+    
+    selected.sort(key=lambda x: x[0])
+    best_frames = [frame for _, frame, _ in selected]
+    
+    if len(best_frames) < keep_n:
+        print(f"Warning: Only selected {len(best_frames)}/{keep_n} frames due to max_gap constraint")
+        print(f"Consider increasing --max_gap or decreasing --max_frames")
+    
+    print(f"Sliding window: selected {len(best_frames)} frames from {num_segments} segments")
+    return best_frames
 
 def preprocess_frame(frame, target_size):
     h, w = frame.shape[:2]
@@ -42,7 +106,7 @@ def save_frames(frames, output_dir, target_size=1200):
     if not frames:
         return
     h, w = frames[0].shape[:2]
-    print(f"preprocessing: {w}x{h} → center crop → {target_size}x{target_size}")
+    print(f"preprocessing: {w}x{h} → {target_size}x{target_size}")
     print(f"saving {len(frames)} frames...")
     for i, frame in enumerate(frames):
         processed = preprocess_frame(frame, target_size)
@@ -53,7 +117,6 @@ def _run(cmd):
 
 def get_model_size(model_path):
     try:
-        import struct
         with open(model_path / "images.bin", "rb") as f:
             return struct.unpack('Q', f.read(8))[0]
     except:
@@ -87,7 +150,7 @@ def run_colmap(frames_dir, use_gpu=True):
         "colmap", "sequential_matcher",
         "--database_path", str(db),
         "--SiftMatching.use_gpu", "1" if use_gpu else "0",
-        "--SequentialMatching.overlap", "15",
+        "--SequentialMatching.overlap", "30",
         "--SequentialMatching.quadratic_overlap", "1",
     ])
     
@@ -112,12 +175,9 @@ def run_colmap(frames_dir, use_gpu=True):
     
     if model.name != "0":
         print(f"renaming {model.name} to 0 and removing other models...")
-        import shutil
-        
         for other_model in models:
             if other_model != model:
                 shutil.rmtree(other_model)
-                print(f"removed {other_model.name}")
         
         model_0 = sparse / "0"
         if model_0.exists():
@@ -153,6 +213,8 @@ if __name__ == "__main__":
     parser.add_argument("--max_frames", type=int, default=350, help="max frames to keep (default: 350, keeps sharpest)")
     parser.add_argument("--target_size", type=int, default=1200, help="target image size after crop/resize (default: 1200)")
     parser.add_argument("--use_gpu", action="store_true", help="use GPU for COLMAP")
+    parser.add_argument("--sliding_window", action="store_true", help="use sliding window filter to prevent temporal gaps")
+    parser.add_argument("--max_gap", type=int, default=20, help="max temporal gap between frames (default: 20)")
     args = parser.parse_args()
     if not os.path.exists(args.video_path):
         print(f"error: video file '{args.video_path}' not found")
@@ -162,8 +224,12 @@ if __name__ == "__main__":
     print(f"sampled {len(frames)} frames")
     
     if len(frames) > args.max_frames:
-        print(f"filtering to {args.max_frames} sharpest frames...")
-        frames = filter_sharp_frames(frames, keep_n=args.max_frames)
+        if args.sliding_window:
+            print(f"filtering to {args.max_frames} frames using sliding window...")
+            frames = filter_sharp_frames_sliding_window(frames, keep_n=args.max_frames, max_gap=args.max_gap)
+        else:
+            print(f"filtering to {args.max_frames} sharpest frames...")
+            frames = filter_sharp_frames(frames, keep_n=args.max_frames)
     
     images_dir = os.path.join(args.output_dir, "images")
     save_frames(frames, images_dir, target_size=args.target_size)
