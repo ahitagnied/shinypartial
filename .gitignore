@@ -5,3 +5,8 @@ output/*/
 **/*.png
 **/*.exr
 colmap/*
+*.json
+*.obj
+*.mtl
+*.png
+*.ply
