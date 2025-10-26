@@ -10,3 +10,4 @@ colmap/*
 *.mtl
 *.png
 *.ply
+*.tiff
