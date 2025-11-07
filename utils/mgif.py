@@ -19,13 +19,13 @@ def make_gif(folder_name, name, duration=0.03):
     )
 
     images = [imageio.imread(os.path.join(train_folder, f)) for f in files]
-    imageio.mimsave(output_dir, images, duration=duration, loop=0, disposal=2)
+    imageio.mimsave(output_dir, images, format='GIF', duration=duration, loop=0, disposal=2)
 
     print(f'saved {name}.gif to {output_dir} ({len(images)} frames @ {duration}s/frame)')
 
 def main():
     if len(sys.argv) > 1:
-        folder_name = sys.argv[1]
+        folder_name = sys.argv[1].rstrip('/')
         if os.path.isdir(folder_name):
             make_gif(folder_name, os.path.basename(folder_name), duration=0.03)
         else:
