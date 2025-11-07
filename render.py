@@ -26,7 +26,9 @@ def render_scene(config, train_ratio=0.33, mode="auto"):
     
     if mode == "single":
         objects = [import_single_object(config["blender_obj"])]
-        target = objects[0].location
+        obj = objects[0]
+        bbox_corners = [obj.matrix_world @ Vector(corner) for corner in obj.bound_box]
+        target = sum(bbox_corners, Vector((0, 0, 0))) / len(bbox_corners)
     else:
         objects = import_multiple_objects(config)
         target = get_centroid(objects)
