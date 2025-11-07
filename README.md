@@ -3,8 +3,9 @@
 Generate datasets for training 3D Gaussian Splatting models with multiple camera trajectory patterns.
 
 <div align="center">
-  <img src="public/gif/mirror_t45-120_p0-60_plus_center.gif" width="40%" />
-  <img src="public/gif/vase_lod0_t45-120_p0-60_plus_center.gif" width="40%" />
+  <img src="public/gif/bean_t45-120_p0-60_plus_center.gif" width="30%" />
+  <img src="public/gif/cola_t45-120_p0-60_plus_center.gif" width="30%" />
+  <img src="public/gif/vase_t45-120_p0-60_plus_center.gif" width="30%" />
 </div>
 
 ## Camera Trajectories
