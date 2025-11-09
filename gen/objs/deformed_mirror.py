@@ -10,10 +10,10 @@ NOISE_OCTAVES = 4
 MIRROR_RESOLUTION = 512
 MIRROR_SIZE = 220.0  # -mirror_size to +mirror_size
 DEFORM_SCALE = 2.0
-OUTPUT_FILENAME = "deformed_surface.obj"
+OUTPUT_FILENAME = "deformed_mirror.obj"
 
-SMOOTH_SCALE = 20.0
-SMOOTH_OCTAVES = 4
+SMOOTH_SCALE = 30.0
+SMOOTH_OCTAVES = 2
 
 def generate_perlin_noise(width=NOISE_WIDTH, height=NOISE_HEIGHT, scale=NOISE_SCALE, octaves=NOISE_OCTAVES):
     def interpolate(a, b, x):

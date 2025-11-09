@@ -1,0 +1,46 @@
+output:
+  directory: "custom"
+  format: "PNG"
+  resolution: [800, 800]
+  samples: 128
+
+blender_obj:
+  path: "./files/deformed_mirror.obj"
+  scale: [1.0, 1.0, 1.0]    
+  location: [0, 0, -10]
+  rotation: [90, 0, 0]  
+  override_materials: true
+  bevel:
+    width: 0.01
+    segments: 2
+    profile: 0.5
+  material:
+    metallic: 0.9
+    roughness: 0.02
+    specular: 1.0
+
+environment:
+  hdri_path: "assets/bedroom.exr"
+
+camera:
+  num_images: 300
+  theta_min_deg: 25
+  theta_max_deg: 85
+  phi_start_deg: 0
+  phi_end_deg: 360
+  distance: 7.0
+
+  trajectory_type: "plus"
+  look_at: "center"
+
+  plane_distance: 800
+  plane_normal: [0, 0.4, -0.2]
+
+  diamond_size: 5.0
+
+  plus_horizontal_length: 1000.0
+  plus_vertical_length: 1000.0
+
+  trajectory_offset: [0, 0, -10]
+
+  zigzag_width: 7.0
