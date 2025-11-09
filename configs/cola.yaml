@@ -6,43 +6,42 @@ output:
 
 blender_obj:
   path: "./files/cola.obj"
-  scale: [10.0, 10.0, 10.0]
+  scale: [1.0, 1.0, 1.0]    
   location: [0, 0, 0]
-  rotation: [90, 0, 45]
-  override_materials: true
+  rotation: [90, 0, 0]  
+  override_materials: false
   bevel:
     width: 0.01
     segments: 2
     profile: 0.5
   material:
-    metallic: 0.95
+    metallic: 0.8
     roughness: 0.02
     specular: 1.0
 
 environment:
-  hdri_path: "assets/playroom.exr"
+  hdri_path: "assets/bedroom.exr"
 
 camera:
   num_images: 300
-  theta_min_deg: 45
-  theta_max_deg: 120
+  theta_min_deg: 25
+  theta_max_deg: 85
   phi_start_deg: 0
-  phi_end_deg: 60
-  distance: 27.0
-  
+  phi_end_deg: 360
+  distance: 7.0
+
   trajectory_type: "plus"
   look_at: "center"
-  
-  plane_distance: 60.0
-  plane_normal: [1, 0, 0]
-  
+
+  plane_distance: 3.5
+  plane_normal: [0.3, 0.4, 0]
+
   diamond_size: 5.0
 
-  plus_horizontal_length: 120.0
-  plus_vertical_length: 100.0
-  
+  plus_horizontal_length: 10.0
+  plus_vertical_length: 10.0
+
   trajectory_offset: [0, 0, 0]
-  
+
   zigzag_width: 7.0
   zigzag_height: 7.0
-
