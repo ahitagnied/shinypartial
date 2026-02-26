@@ -1,7 +1,0 @@
-bpy==4.5.2
-imageio==2.37.0
-mathutils==3.3.0
-numpy==2.3.2
-PyYAML==6.0.2
-PyYAML==6.0.2
-opencv-python>=4.5.0
